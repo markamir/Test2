@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Ouber</string>
+    <string name="title_activity_driver_map">Map</string>
+    <string name="title_activity_customer_map">Map</string>
+    <string name="Ouber">Ouber</string>
+
+
+</resources>
