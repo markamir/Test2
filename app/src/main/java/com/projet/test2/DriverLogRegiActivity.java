@@ -16,6 +16,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -26,9 +28,13 @@ public class DriverLogRegiActivity extends AppCompatActivity {
     private TextView DriverStatus;
     private EditText EmailDriver;
     private EditText PasswordDriver;
+    private DatabaseReference driversDatabaseRef;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener firebaseAuthListener;
     private ProgressDialog loadingBar;
+    private FirebaseUser currentUser;
+    String currentUserId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate ( savedInstanceState );
@@ -75,7 +81,10 @@ public class DriverLogRegiActivity extends AppCompatActivity {
             }
         } );
     }
-//////////login method////////
+
+
+
+    //////////login method////////
     private void SignInDriver(String password , String email) {
         if (TextUtils.isEmpty ( email )){
             Toast.makeText (DriverLogRegiActivity.this,"enter your Email",Toast.LENGTH_SHORT).show ();
@@ -91,10 +100,13 @@ public class DriverLogRegiActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task <AuthResult> task) {
                     if (task.isSuccessful ()){
-                        Toast.makeText ( DriverLogRegiActivity.this,"logged in",Toast.LENGTH_SHORT ).show ();
-                        loadingBar.dismiss ();
+                        currentUserId =  mAuth.getCurrentUser ( ).getUid();
+                        driversDatabaseRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(currentUserId);
+                        driversDatabaseRef.setValue(true);
                         Intent DriverIntent= new Intent (DriverLogRegiActivity.this,DriverMapActivity.class);
                         startActivity (DriverIntent  );
+                        Toast.makeText ( DriverLogRegiActivity.this,"logged in",Toast.LENGTH_SHORT ).show ();
+                        loadingBar.dismiss ();
                     }
                     else {
                         Toast.makeText ( DriverLogRegiActivity.this,"logging ERROR!",Toast.LENGTH_SHORT ).show ();
@@ -107,34 +119,31 @@ public class DriverLogRegiActivity extends AppCompatActivity {
 
 
 //register methodd//////////////////
-    private void RegeisterDriver(String email , String password) {
+   private void RegeisterDriver(String email , String password) {
         if (TextUtils.isEmpty ( email )){
-            Toast.makeText (DriverLogRegiActivity.this,"enter your Email",Toast.LENGTH_SHORT).show ();
-        }
-        if (TextUtils.isEmpty ( password)){
-            Toast.makeText (DriverLogRegiActivity.this,"enter your password",Toast.LENGTH_SHORT).show ();
-        }
+            Toast.makeText (DriverLogRegiActivity.this,"enter your Email",Toast.LENGTH_SHORT).show (); }
+       if (TextUtils.isEmpty ( password)){
+            Toast.makeText (DriverLogRegiActivity.this,"enter your password",Toast.LENGTH_SHORT).show (); }
         else {
             loadingBar.setTitle ( "Driver Registration" );
             loadingBar.setMessage ( "please wait..." );
-            loadingBar.show ();
+           loadingBar.show ();
             mAuth.createUserWithEmailAndPassword ( email, password ).addOnCompleteListener ( new OnCompleteListener <AuthResult> ( ) {
-                @Override
-                public void onComplete(@NonNull Task <AuthResult> task) {
-                    if (task.isSuccessful ()){
-                        Toast.makeText ( DriverLogRegiActivity.this,"Registered",Toast.LENGTH_SHORT ).show ();
-                        String userID =mAuth.getCurrentUser ().getUid ();
-                        //DatabaseReference current_user_db= FirebaseDatabase.getInstance ().getReference ().child (  )
-                        loadingBar.dismiss ();
+               @Override
+               public void onComplete(@NonNull Task <AuthResult> task) {
+                  if (task.isSuccessful ()){
+                    Toast.makeText ( DriverLogRegiActivity.this,"Registered",Toast.LENGTH_SHORT ).show ();
+                    currentUserId = mAuth.getCurrentUser().getUid();
+                      driversDatabaseRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(currentUserId);
+                      driversDatabaseRef.setValue(true);
+                      loadingBar.dismiss ();
                         Intent DriverIntent= new Intent (DriverLogRegiActivity.this,DriverMapActivity.class);
-                        startActivity (DriverIntent  );
-                    }
-                    else {
-                        Toast.makeText ( DriverLogRegiActivity.this,"ERROR!",Toast.LENGTH_SHORT ).show ();
-                        loadingBar.dismiss ();
-                    }
-                }
-            } );
-        }
+                       startActivity (DriverIntent  ); }
+                   else {
+                       Toast.makeText ( DriverLogRegiActivity.this,"ERROR!",Toast.LENGTH_SHORT ).show ();
+                        loadingBar.dismiss (); }
+               }
+           } );
+       }
     }
 }

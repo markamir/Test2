@@ -16,6 +16,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.Objects;
 
 public class CustomerLogRegActivity extends AppCompatActivity {
     private Button CustomerLogBtn;
@@ -26,6 +31,12 @@ public class CustomerLogRegActivity extends AppCompatActivity {
     private EditText PasswordCustomer;
     private FirebaseAuth mAuth;
     private ProgressDialog loadingbar;
+    private DatabaseReference customersDatabaseRef;
+    private FirebaseAuth.AuthStateListener firebaseAuthListner;
+
+
+    private FirebaseUser currentUser;
+    String currentUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +70,7 @@ public class CustomerLogRegActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String email  = EmailCustomer.getText ().toString ();
-                String password  = PasswordCustomer.getText ().toString ();
+                String password  = PasswordCustomer.getText().toString ();
                 RegisterCustomer(email,password);
             }
         } );
@@ -76,13 +87,10 @@ public class CustomerLogRegActivity extends AppCompatActivity {
     }
 /////////////////login button///////////////////
     private void SignInCustomer(String email , String password) {
-
         if (TextUtils.isEmpty ( email )){
-            Toast.makeText (CustomerLogRegActivity.this,"enter your Email",Toast.LENGTH_SHORT).show ();
-        }
+            Toast.makeText (CustomerLogRegActivity.this,"enter your Email",Toast.LENGTH_SHORT).show (); }
         if (TextUtils.isEmpty ( password)){
-            Toast.makeText (CustomerLogRegActivity.this,"enter your password",Toast.LENGTH_SHORT).show ();
-        }
+            Toast.makeText (CustomerLogRegActivity.this,"enter your password",Toast.LENGTH_SHORT).show (); }
         else {
             loadingbar.setTitle ( "Customer logging" );
             loadingbar.setMessage ( "please wait..." );
@@ -91,31 +99,25 @@ public class CustomerLogRegActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task <AuthResult> task) {
                     if (task.isSuccessful ()){
-                        Toast.makeText ( CustomerLogRegActivity.this,"logged in",Toast.LENGTH_SHORT ).show ();
-                        loadingbar.dismiss ();
                         Intent CustomerIntent= new Intent (CustomerLogRegActivity.this,CustomerMapActivity.class);
                         startActivity ( CustomerIntent );
+                        Toast.makeText ( CustomerLogRegActivity.this,"logged in",Toast.LENGTH_SHORT ).show ();
+                        loadingbar.dismiss ();
                     }
                     else {
                         Toast.makeText ( CustomerLogRegActivity.this,"logging ERROR!",Toast.LENGTH_SHORT ).show ();
-                        loadingbar.dismiss ();
-                    }
-                }
-            } );
-        }
-    }
+                        loadingbar.dismiss (); } }} ); } }
+
+
 ///////////////////////register button/////////////////////////////
 
     private void RegisterCustomer(String email , String password) {
         if (TextUtils.isEmpty ( email )){
-            Toast.makeText (        CustomerLogRegActivity.this,"enter your Email",Toast.LENGTH_SHORT).show ();
-        }
+            Toast.makeText (CustomerLogRegActivity.this,"enter your Email",Toast.LENGTH_SHORT).show (); }
         if (TextUtils.isEmpty ( password)){
-            Toast.makeText (CustomerLogRegActivity.this,"enter your password",Toast.LENGTH_SHORT).show ();
-        }
-
+            Toast.makeText (CustomerLogRegActivity.this,"enter your password",Toast.LENGTH_SHORT).show (); }
         else {
-            loadingbar.setTitle ( "Customer Registration" );
+            loadingbar.setTitle ( "customer Registration" );
             loadingbar.setMessage ( "please wait..." );
             loadingbar.show ();
             mAuth.createUserWithEmailAndPassword ( email, password ).addOnCompleteListener ( new OnCompleteListener <AuthResult> ( ) {
@@ -123,14 +125,15 @@ public class CustomerLogRegActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task <AuthResult> task) {
                     if (task.isSuccessful ()){
                         Toast.makeText ( CustomerLogRegActivity.this,"Registered",Toast.LENGTH_SHORT ).show ();
-                        loadingbar.dismiss ();
-                        Intent CustomerIntent= new Intent (CustomerLogRegActivity.this,CustomerMapActivity.class);
-                        startActivity ( CustomerIntent );
-                    }
+                        currentUserId =  mAuth.getCurrentUser ( ).getUid();
+                        customersDatabaseRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Customers").child(currentUserId);
+                        customersDatabaseRef.setValue(true);
+                        Intent DriverIntent= new Intent (CustomerLogRegActivity.this,DriverMapActivity.class);
+                        startActivity (DriverIntent  );
+                        loadingbar.dismiss (); }
                     else {
                         Toast.makeText ( CustomerLogRegActivity.this,"ERROR!",Toast.LENGTH_SHORT ).show ();
-                        loadingbar.dismiss ();
-                    }
+                        loadingbar.dismiss (); }
                 }
             } );
         }

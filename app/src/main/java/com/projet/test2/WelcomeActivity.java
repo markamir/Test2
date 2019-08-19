@@ -25,28 +25,6 @@ private Button btnWelcomeDriver;
         setContentView ( R.layout.activity_welcom );
         btnWelcomeDriver = (Button) findViewById(R.id.buttonDriver);
         btnWelcomeCustomer   = (Button)findViewById (R.id.buttonCustomer);
-
-       // mAuth = FirebaseAuth.getInstance();
-
-   //firebaseAuthListner = new FirebaseAuth.AuthStateListener() {
-        //@Override
-        //public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth)
-      // {
-            // currentUser = FirebaseAuth.getInstance().getCurrentUser();
-
-             // if(currentUser != null)
-            // {
-              //   Intent intent = new Intent(WelcomeActivity.this, WelcomeActivity.class);
-                 //  startActivity(intent);
-           // }
-   //  }
-    //  };
-
-
-
-
-
-        //link to the next screen///////////////////////
         btnWelcomeCustomer.setOnClickListener ( new View.OnClickListener ( ) {
             @Override
             public void onClick(View v) {
